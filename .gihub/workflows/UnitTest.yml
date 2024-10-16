@@ -1,0 +1,34 @@
+name: Unit Test
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.22.4  # Укажи свою версию Go
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Run tests and generate coverage
+        run: go test -v -coverprofile=coverage.out ./...
+
+      - name: Validate test coverage
+        run: |
+          COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
+          echo "Test coverage is $COVERAGE%"
+          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+            echo "Test coverage ($COVERAGE%) is below 80%, failing the build."
+            exit 1
+          fi

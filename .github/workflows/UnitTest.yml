@@ -1,4 +1,4 @@
-name: sanekhuisosi
+name: Unit Testing
 
 on:
   pull_request:

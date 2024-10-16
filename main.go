@@ -22,7 +22,7 @@ func Race(c1 *Car, c2 *Car) string {
 	}
 }
 func hasFuelForRace(c *Car) bool {
-	if c.Fuel < 10 {
+	if c.Fuel < 9 {
 		return false
 	}
 	return true

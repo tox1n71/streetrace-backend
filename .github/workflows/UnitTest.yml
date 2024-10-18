@@ -22,7 +22,7 @@ jobs:
         run: go mod download
       - name: Check for //go:build !skip
         run: |
-          if grep -r "//go:build !skip" ./...; then
+          if grep -r "//go:build !skip" .; then
             echo "Error: Found //go:build !skip in code."
             exit 1
           fi

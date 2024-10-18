@@ -20,7 +20,12 @@ jobs:
 
       - name: Install dependencies
         run: go mod download
-
+      - name: Check for //go:build !skip
+        run: |
+          if grep -r "//go:build !skip" ./...; then
+            echo "Error: Found //go:build !skip in code."
+            exit 1
+          fi
       - name: Run tests and generate coverage
         run: go test -v -coverprofile=coverage.out ./...
 

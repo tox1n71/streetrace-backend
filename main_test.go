@@ -1,4 +1,3 @@
-//go:build !skip
 package main
 
 import (

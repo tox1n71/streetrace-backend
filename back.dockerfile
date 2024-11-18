@@ -1,5 +1,5 @@
 FROM ubuntu:latest
-FROM gradle:7.6-jdk17
+FROM gradle:7.6-jdk17 as build
 WORKDIR /backend
 COPY streetrace-api/build.gradle streetrace-api/settings.gradle ./
 RUN gradle dependencies --no-daemon

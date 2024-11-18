@@ -11,6 +11,6 @@ RUN apt-get update && apt-get install -y \
     fonts-dejavu-core \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 WORKDIR /backend
-COPY --from=build /backend/build/libs/*.jar backend.jar
+COPY --from=build /backend/build/libs/*.jar /backend/backend.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/backend/backend.jar"]

@@ -14,6 +14,6 @@ COPY streetrace-api/src ./src
 RUN gradle build -x test --no-daemon
 FROM openjdk:18-jdk-slim
 WORKDIR /backend
-COPY --from=build /backend/build/libs/api-0.0.1-SNAPSHOT.jar /backend/backend.jar
+COPY --from=build /build/libs/api-0.0.1-SNAPSHOT.jar /backend/backend.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/backend/backend.jar"]

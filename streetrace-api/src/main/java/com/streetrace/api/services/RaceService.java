@@ -26,6 +26,7 @@ public class RaceService {
         }
         User friend = userRepository.findById(friendId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        // TODO: тут желательно добавить проверку, что машина принадлежит пользователю
         UserCar userCar = userCarRepository.findById(carId).orElseThrow(()->new EntityNotFoundException("Car not found"));
         UserCar friendCar = friend.getCurrentCar();
 

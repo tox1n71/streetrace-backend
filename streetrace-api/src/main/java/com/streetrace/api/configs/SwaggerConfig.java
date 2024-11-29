@@ -13,7 +13,7 @@ public class SwaggerConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("Street Racing API")
-                        .version("1.0.0")
+                        .version("1.1")
                         .description("API для tg mini apps игры Уличные Гонки"));
     }
 }

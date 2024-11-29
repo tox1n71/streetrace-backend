@@ -23,6 +23,7 @@ public class UserController {
 
     //ручка для сохранения и авторизации пользователя
     @PostMapping("/login")
+    //TODO ТУТ СРОЧНО, ПО ВОЗМОЖНОСТИ ВЕРНУТЬ ЮЗЕРА
     public ResponseEntity<String> authenticateUser(
             @RequestBody TelegramAuthData telegramData,
             @RequestParam(required = false) Long racerId) {
@@ -51,6 +52,5 @@ public class UserController {
     public UserResourcesDTO getUserResources(@RequestParam Long userId) {
         return userService.getUserResources(userId);
     }
-
 
 }

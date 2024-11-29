@@ -100,7 +100,7 @@ public class UserService {
         // Сохраняем пользователя (для нового или обновленного списка друзей)
         userRepository.save(user);
 
-        return user.getFriends().toString();
+        return "user.toString()";
     }
 
     private boolean isTelegramAuthDataValid(TelegramAuthData data) {

@@ -19,16 +19,16 @@ public class UserCarController {
     // ручка, чтобы достать все автомобили пользователя
     // туду: переделать на экстракт токен, как и везде, потому что я ленивый очоч:((
     @GetMapping
-    public List<UserCarDTO> getAllUserCars(@RequestParam long userId) {
-        return userCarService.getAllUserCars(userId);
+    public List<UserCarDTO> getAllUserCars(@RequestHeader("Authorization") String jwtToken) {
+        return userCarService.getAllUserCars(jwtToken.substring(7));
     }
 
     //ручка для покупки машины
     @PostMapping("/buy")
     // id пользователя и id модели машины
-    public ResponseEntity<String> buyCar(@RequestParam Long userId, @RequestParam Long carId) {
+    public ResponseEntity<String> buyCar(@RequestHeader("Authorization") String jwtToken, @RequestParam Long carId) {
         try {
-            String result = userCarService.buyCar(userId, carId);
+            String result = userCarService.buyCar(jwtToken.substring(7), carId);
             return ResponseEntity.ok(result);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -40,9 +40,9 @@ public class UserCarController {
     //ручка для покраски машины
     @PostMapping("{id}/color")
     // id машины пользователя, цвет желаемый, его стоимость
-    public ResponseEntity<String> changeCarColor(@PathVariable Long id, @RequestParam String color, @RequestParam int cost) {
+    public ResponseEntity<String> changeCarColor(@RequestHeader("Authorization") String jwtToken, @PathVariable Long id, @RequestParam String color, @RequestParam int cost) {
         try {
-            String result = userCarService.changeCarColor(id, color, cost);
+            String result = userCarService.changeCarColor(jwtToken.substring(7),id, color, cost);
             return ResponseEntity.ok(result);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

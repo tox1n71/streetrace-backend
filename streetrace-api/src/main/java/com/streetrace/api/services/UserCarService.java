@@ -9,6 +9,7 @@ import com.streetrace.api.exceptions.ResourceNotFoundException;
 import com.streetrace.api.repos.CarModelRepository;
 import com.streetrace.api.repos.UserCarRepository;
 import com.streetrace.api.repos.UserRepository;
+import com.streetrace.api.security.JwtService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,10 @@ public class UserCarService {
     private final UserCarRepository userCarRepository;
     private final UserRepository userRepository;
     private final CarModelRepository carModelRepository;
-    public List<UserCarDTO> getAllUserCars(Long userId) {
+    private final JwtService jwtService;
+
+    public List<UserCarDTO> getAllUserCars(String jwtToken) {
+        Long userId = Long.valueOf(jwtService.extractId(jwtToken));
         List<UserCar> userCars = userCarRepository.findByUserId(userId);
         List<UserCarDTO> userCarDTOs = new ArrayList<>();
         for (UserCar userCar : userCars) {
@@ -32,7 +36,8 @@ public class UserCarService {
         return userCarDTOs;
     }
 
-    public String buyCar(Long userId, Long carModelId) throws NotEnoughMoneyException {
+    public String buyCar(String jwtToken, Long carModelId) throws NotEnoughMoneyException {
+        Long userId = Long.valueOf(jwtService.extractId(jwtToken));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Пользователь не найден"));
         // Получаем модель машины
@@ -55,9 +60,14 @@ public class UserCarService {
         return "За деньги да!";
     }
 
-    public String changeCarColor(Long userCarId, String color, int colorCost) throws NotEnoughMoneyException {
+    public String changeCarColor(String jwtToken, Long userCarId, String color, int colorCost) throws NotEnoughMoneyException {
+        Long userId = Long.valueOf(jwtService.extractId(jwtToken));
+
         UserCar userCar = userCarRepository.findById(userCarId).
                 orElseThrow(() -> new ResourceNotFoundException("Машина пользователя не найдена"));
+        if (!userCar.getUser().getId().equals(userId)) {
+            throw new NotEnoughMoneyException("Угон запрещен на этом сервере");
+        }
         if (userCar.getUser().getMoney() < colorCost) {
             throw new NotEnoughMoneyException("Кыш, нищук!");
         }

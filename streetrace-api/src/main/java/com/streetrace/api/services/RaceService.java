@@ -7,6 +7,7 @@ import com.streetrace.api.exceptions.NotEnoughFuelException;
 import com.streetrace.api.repos.RaceRepository;
 import com.streetrace.api.repos.UserCarRepository;
 import com.streetrace.api.repos.UserRepository;
+import com.streetrace.api.security.JwtService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,10 @@ public class RaceService {
     private final UserRepository userRepository;
     private final UserCarRepository userCarRepository;
     private final RaceRepository raceRepository;
+    private final JwtService jwtService;
 
-    public Boolean race(Long userId, Long carId, Long friendId) throws NotEnoughFuelException {
+    public Boolean race(String jwtToken, Long carId, Long friendId) throws NotEnoughFuelException {
+        Long userId = Long.valueOf(jwtService.extractId(jwtToken));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         if (user.getFuel() < 10){

@@ -1,0 +1,30 @@
+version: '3'
+services:
+  back-end:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    expose:
+      - 8080
+    depends_on:
+      - db
+    networks:
+      - ivan
+  db:
+    build:
+      context: .
+      dockerfile: db.Dockerfile
+    expose:
+      - 5432
+    ports:
+      - "5555:5432"
+    environment:
+      POSTGRES_DB: street-racing
+      POSTGRES_USER: ivan
+      POSTGRES_PASSWORD: password
+    networks:
+      - ivan
+networks:
+  ivan:

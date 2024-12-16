@@ -14,9 +14,9 @@ public class RaceController {
     private final RaceService raceService;
     @PostMapping
     // пожалуйста не забудьте что здесь carId относится к пользователю!!!!! У друга последнюю достаем, он не в приоритете
-    public ResponseEntity race(@RequestParam Long userId, @RequestParam Long carId,@RequestParam Long friendId) {
+    public ResponseEntity race(@RequestHeader("Authorization") String jwtToken, @RequestParam Long carId,@RequestParam Long friendId) {
         try{
-            Boolean race = raceService.race(userId, carId, friendId);
+            Boolean race = raceService.race(jwtToken.substring(7), carId, friendId);
             return ResponseEntity.ok(race);
         }
         catch (NotEnoughFuelException e){

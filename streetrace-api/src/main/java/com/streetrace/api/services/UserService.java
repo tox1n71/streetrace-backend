@@ -6,15 +6,17 @@ import com.streetrace.api.dto.UserStatsDTO;
 import com.streetrace.api.entities.*;
 import com.streetrace.api.entities.car.CarModel;
 import com.streetrace.api.entities.car.UserCar;
+import com.streetrace.api.models.Role;
 import com.streetrace.api.repos.CarModelRepository;
 import com.streetrace.api.repos.UserRepository;
+import com.streetrace.api.security.JwtService;
 import com.streetrace.api.utils.TelegramAuthData;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.streetrace.api.mappers.UserCarMapper.convertToUserCarDTO;
@@ -27,7 +29,7 @@ import static com.streetrace.api.mappers.UserCarMapper.convertToUserCarDTO;
 public class UserService {
     private final UserRepository userRepository;
     private final CarModelRepository carModelRepository;
-
+    private final JwtService jwtService;
     //TODO: добавить логику проверки пользователя
 
     public String authenticate(TelegramAuthData telegramData, Long referralId) {
@@ -56,6 +58,7 @@ public class UserService {
                     .fuel(100) // стартовый бензин
                     .friends(new ArrayList<>()) // Инициализируем список друзей
                     .userCars(new ArrayList<>()) // Инициализируем список машин
+                    .role(Role.USER)
                     .build();
 
             // Добавляем стартовую машину
@@ -100,17 +103,18 @@ public class UserService {
         // Сохраняем пользователя (для нового или обновленного списка друзей)
         userRepository.save(user);
 
-        return "user.toString()";
+        //генерируем токен
+        return jwtService.generateToken(user.getId());
     }
 
-    private boolean isTelegramAuthDataValid(TelegramAuthData data) {
-        // Тут проверка подписи от Telegram
-        return true; // Временный ответ для примера
+    public boolean isTelegramAuthDataValid(TelegramAuthData data) {
+        return true;
     }
 
 
     // метод для получения друзей пользователя
-    public List<UserFriendInfoDTO> getFriendsInfo(Long userId) {
+    public List<UserFriendInfoDTO> getFriendsInfo(String jwtToken) {
+        Long userId = Long.valueOf(jwtService.extractId(jwtToken));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         List<User> friends = user.getFriends();
@@ -132,7 +136,9 @@ public class UserService {
 
 
     // метод для получения информации о текущем пользователе
-    public UserStatsDTO getUserInfo(Long userId) {
+    public UserStatsDTO getUserInfo(String jwtToken) {
+        Long userId = Long.valueOf(jwtService.extractId(jwtToken));
+        System.out.println("PISKA");
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         return new UserStatsDTO(
@@ -146,7 +152,8 @@ public class UserService {
                 user.getFuelTankLevel()
         );
     }
-    public UserResourcesDTO getUserResources(Long userId) {
+    public UserResourcesDTO getUserResources(String jwtToken) {
+        Long userId = Long.valueOf(jwtService.extractId(jwtToken));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         return UserResourcesDTO.builder()

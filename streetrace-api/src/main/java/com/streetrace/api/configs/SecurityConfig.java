@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers("/api/user/login").anonymous()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll() // Разрешить доступ к Swagger UI
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()

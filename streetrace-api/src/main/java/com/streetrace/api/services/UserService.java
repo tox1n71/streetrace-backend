@@ -1,13 +1,16 @@
 package com.streetrace.api.services;
 
 import com.streetrace.api.dto.UserFriendInfoDTO;
+import com.streetrace.api.dto.UserFullNameDTO;
 import com.streetrace.api.dto.UserResourcesDTO;
 import com.streetrace.api.dto.UserStatsDTO;
 import com.streetrace.api.entities.*;
 import com.streetrace.api.entities.car.CarModel;
 import com.streetrace.api.entities.car.UserCar;
+import com.streetrace.api.exceptions.NotEnoughMoneyException;
 import com.streetrace.api.models.Role;
 import com.streetrace.api.repos.CarModelRepository;
+import com.streetrace.api.repos.UserCarRepository;
 import com.streetrace.api.repos.UserRepository;
 import com.streetrace.api.security.JwtService;
 import com.streetrace.api.utils.TelegramAuthData;
@@ -30,6 +33,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final CarModelRepository carModelRepository;
     private final JwtService jwtService;
+    private final UserCarRepository userCarRepository;
     //TODO: добавить логику проверки пользователя
 
     public String authenticate(TelegramAuthData telegramData, Long referralId) {
@@ -163,4 +167,50 @@ public class UserService {
                 .currentCarPower(user.getCurrentCar().getPower())
                 .build();
     }
+
+    public String updateCurrentCar(String token, Long carId){
+        Long userId = Long.valueOf(jwtService.extractId(token));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        UserCar newCurrentCar = userCarRepository.findById(carId)
+                .orElseThrow(() -> new EntityNotFoundException("UserCar not found"));
+
+        if (!user.getUserCars().contains(newCurrentCar)) {
+            throw new IllegalArgumentException("Угон запрещен на этом сервере");
+        }
+        user.setCurrentCar(newCurrentCar);
+        userRepository.save(user);
+        return "The " + newCurrentCar.getModel().getBrand() + " knew exactly that they want";
+    }
+    public String buyFuel(String token){
+        Long userId = Long.valueOf(jwtService.extractId(token));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        if (user.getMoney() < 3000){
+            throw new NotEnoughMoneyException("Я тут циферки прикинул... мы это просто не потянем... я не волшебник");
+        }
+        user.setMoney(user.getMoney() - 3000);
+        user.setFuel(100);
+        userRepository.save(user);
+        return "полный 95-го залили";
+    }
+    public String generateInvitationLink(String token){
+        Long userId = Long.valueOf(jwtService.extractId(token));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        return "https://t.me/streetracevkbot?startapp=racerId_" + user.getTelegramId();
+    }
+
+    public UserFullNameDTO getFullName(String token){
+        Long userId = Long.valueOf(jwtService.extractId(token));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        UserFullNameDTO fullNameDTO = UserFullNameDTO.builder()
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .build();
+        return fullNameDTO;
+    }
+
 }

@@ -22,7 +22,8 @@ public class UserCarVinyl {
     @JoinColumn(name = "vinyl_id")
     private Vinyl vinyl;
 
-    private int x; // Координата X
-    private int y; // Координата Y
+    private float x; // Координата X
+    private float y; // Координата Y
     private float rotationAngle; // Угол поворота винила
+    private float scale;
 }

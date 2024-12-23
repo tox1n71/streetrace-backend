@@ -1,18 +1,24 @@
 package com.streetrace.api.services;
 
 import com.streetrace.api.dto.car.UserCarDTO;
+import com.streetrace.api.dto.car.VinylRequest;
 import com.streetrace.api.entities.User;
 import com.streetrace.api.entities.car.CarModel;
 import com.streetrace.api.entities.car.UserCar;
+import com.streetrace.api.entities.car.UserCarVinyl;
+import com.streetrace.api.entities.car.Vinyl;
 import com.streetrace.api.exceptions.NotEnoughMoneyException;
 import com.streetrace.api.exceptions.ResourceNotFoundException;
 import com.streetrace.api.repos.CarModelRepository;
 import com.streetrace.api.repos.UserCarRepository;
 import com.streetrace.api.repos.UserRepository;
+import com.streetrace.api.repos.VinylRepository;
 import com.streetrace.api.security.JwtService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +31,7 @@ public class UserCarService {
     private final UserRepository userRepository;
     private final CarModelRepository carModelRepository;
     private final JwtService jwtService;
+    private final VinylRepository vinylRepository;
 
     public List<UserCarDTO> getAllUserCars(String jwtToken) {
         Long userId = Long.valueOf(jwtService.extractId(jwtToken));
@@ -75,5 +82,35 @@ public class UserCarService {
         userCar.setColor(color);
         userCarRepository.save(userCar);
         return "Не бит, не крашен(ну типа ) )";
+    }
+
+    public String addVinylToCar(String token, Long carId, VinylRequest vinylRequest) {
+        // Логика добавления винила на машину
+        Long userId = Long.valueOf(jwtService.extractId(token));
+        User user = userRepository.findById(userId)
+                .orElseThrow(EntityNotFoundException::new);
+        UserCar userCar = userCarRepository.findById(carId)
+                .orElseThrow(() -> new EntityNotFoundException("User car not found"));
+        if (!userCar.getUser().getId().equals(userId)) {
+            throw new NotEnoughMoneyException("Угон запрещен на этом сервере");
+        }
+        Vinyl vinyl = vinylRepository.findById(vinylRequest.getVinylId())
+                .orElseThrow(() -> new EntityNotFoundException("Vinyl not found"));
+        if (user.getMoney() < vinyl.getPrice()) {
+            throw new NotEnoughMoneyException("Кыш, нищук");
+        }
+        user.setMoney(user.getMoney() - vinyl.getPrice());
+        // Добавляем винил на машину
+        UserCarVinyl userCarVinyl = UserCarVinyl.builder()
+                .x(vinylRequest.getX())
+                .y(vinylRequest.getY())
+                .scale(vinylRequest.getScale())
+                .rotationAngle(vinylRequest.getRotationAngle())
+                .vinyl(vinyl)
+                .build();
+        userCar.getUserCarVinyls().add(userCarVinyl);
+        userCarRepository.save(userCar);
+        userRepository.save(user);
+        return "Теперь точно гоночная";
     }
 }

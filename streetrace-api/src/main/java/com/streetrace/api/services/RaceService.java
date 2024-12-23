@@ -1,5 +1,6 @@
 package com.streetrace.api.services;
 
+import com.streetrace.api.dto.RaceDTO;
 import com.streetrace.api.entities.Race;
 import com.streetrace.api.entities.User;
 import com.streetrace.api.entities.car.UserCar;
@@ -10,7 +11,15 @@ import com.streetrace.api.repos.UserRepository;
 import com.streetrace.api.security.JwtService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -48,6 +57,7 @@ public class RaceService {
                 .userCarHorsepower(userCar.getPower())
                 .userWon(result)
                 .friend(friend)
+                .raceTime(LocalDateTime.now())
                 .build();
         friend.setWasCalledCount(friend.getWasCalledCount() + 1);
         user.setRacesCount(user.getRacesCount() + 1);
@@ -66,4 +76,28 @@ public class RaceService {
         // победа, если случайное число меньше шанса
         return result;
     }
+
+    public List<RaceDTO> getLastRacesForUser(String token) {
+        Long userId = Long.valueOf(jwtService.extractId(token));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        // Ограничиваем запрос 4 последними гонками
+        Pageable pageable = PageRequest.of(0, 4, Sort.by(Sort.Order.desc("raceTime")));
+        List<Race> races = raceRepository.findByUserOrderByRaceTimeDesc(user, pageable);
+
+        // Проверяем, что races не равен null
+        if (races == null || races.isEmpty()) {
+            return new ArrayList<>(); // Возвращаем пустой список, если гонок нет
+        }
+
+        // Преобразуем в DTO с помощью Lombok Builder
+        return races.stream()
+                .map(race -> RaceDTO.builder()
+                        .friendName(race.getFriend().getFirstName())  // Предполагаем, что getFriend() и getFirstName() корректны
+                        .userWon(race.isUserWon())  // Предполагаем, что метод isUserWon() есть в модели Race
+                        .build())
+                .collect(Collectors.toList());
+    }
+
 }

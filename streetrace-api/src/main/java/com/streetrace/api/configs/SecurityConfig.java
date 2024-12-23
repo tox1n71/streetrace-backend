@@ -53,7 +53,7 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") // Разрешаем доступ ко всем эндпоинтам
-                        .allowedOrigins("http://localhost:3000", "https://curious-alert-stag.ngrok-free.app")
+                        .allowedOrigins("http://localhost:3000", "https://curious-alert-stag.ngrok-free.app", "http://192.168.68.119:3000")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Разрешаем эти методы
                         .allowedHeaders("*") // Разрешаем все заголовки
                         .allowCredentials(true); // Разрешаем отправку cookies (если нужно)

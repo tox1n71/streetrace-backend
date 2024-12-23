@@ -3,6 +3,8 @@ package com.streetrace.api.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Builder
 @Getter
 @Setter
@@ -25,5 +27,5 @@ public class Race {
     private int userCarHorsepower;  // Лошадиные силы машины пользователя
     private int friendCarHorsepower;  // Лошадиные силы машины друга
     private boolean userWon;  // Результат гонки (победа/поражение)(а еще может exception лютый тип нет бензина)
-
+    private LocalDateTime raceTime;
 }

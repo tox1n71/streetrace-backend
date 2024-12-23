@@ -1,2 +1,2 @@
 FROM postgres:latest
-COPY db.sql /docker-entrypoint-initdb.d/db.sql
+COPY db2.sql /docker-entrypoint-initdb.d/db.sql

@@ -23,4 +23,9 @@ public class RaceController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
+    @GetMapping("/get-last-four-races")
+    public ResponseEntity getLastFourRaces(@RequestHeader("Authorization") String jwtToken) {
+            return ResponseEntity.ok(raceService.getLastRacesForUser(jwtToken.substring(7)));
+    }
 }

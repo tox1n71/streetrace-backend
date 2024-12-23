@@ -35,7 +35,7 @@ public class UserService {
     private final JwtService jwtService;
     private final UserCarRepository userCarRepository;
     //TODO: добавить логику проверки пользователя
-
+    //TODO: !! Сделать проверку, что если юзер поменял что-то КРОМЕ tgId, то поменять и вбд
     public String authenticate(TelegramAuthData telegramData, Long referralId) {
         if (!isTelegramAuthDataValid(telegramData)) {
             throw new IllegalArgumentException("Invalid Telegram Auth Data");

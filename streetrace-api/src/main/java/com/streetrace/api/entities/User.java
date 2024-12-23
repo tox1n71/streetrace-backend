@@ -50,7 +50,7 @@ public class User implements UserDetails {
     private int moneySpend;
     private int moneyWon;
     // друзьяшки (the boys)
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(
             name = "user_friends",
             joinColumns = @JoinColumn(name = "user_id"),

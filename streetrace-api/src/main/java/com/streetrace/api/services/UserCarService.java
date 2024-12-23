@@ -69,7 +69,8 @@ public class UserCarService {
 
     public String changeCarColor(String jwtToken, Long userCarId, String color, int colorCost) throws NotEnoughMoneyException {
         Long userId = Long.valueOf(jwtService.extractId(jwtToken));
-
+        User user = userRepository.findById(userId)
+                .orElseThrow(EntityNotFoundException::new);
         UserCar userCar = userCarRepository.findById(userCarId).
                 orElseThrow(() -> new ResourceNotFoundException("Машина пользователя не найдена"));
         if (!userCar.getUser().getId().equals(userId)) {
@@ -81,6 +82,7 @@ public class UserCarService {
         userCar.getUser().setMoney(userCar.getUser().getMoney() - colorCost);
         userCar.setColor(color);
         userCarRepository.save(userCar);
+        userRepository.save(user);
         return "Не бит, не крашен(ну типа ) )";
     }
 
@@ -107,6 +109,7 @@ public class UserCarService {
                 .scale(vinylRequest.getScale())
                 .rotationAngle(vinylRequest.getRotationAngle())
                 .vinyl(vinyl)
+                .userCar(userCar)
                 .build();
         userCar.getUserCarVinyls().add(userCarVinyl);
         userCarRepository.save(userCar);

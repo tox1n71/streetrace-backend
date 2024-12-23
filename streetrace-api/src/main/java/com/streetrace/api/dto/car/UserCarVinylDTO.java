@@ -14,4 +14,5 @@ public class UserCarVinylDTO {
     private float x; // Координата X
     private float y; // Координата Y
     private float rotationAngle; // Угол поворота винила
+    private float scale;
 }

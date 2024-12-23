@@ -21,6 +21,7 @@ public class UserCarMapper {
                                 .x(vinyl.getX())
                                 .y(vinyl.getY())
                                 .rotationAngle(vinyl.getRotationAngle())
+                                .scale(vinyl.getScale())
                                 .build()
                         ).collect(Collectors.toList()))
                 .build();

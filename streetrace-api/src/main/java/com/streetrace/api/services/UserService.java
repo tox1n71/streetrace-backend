@@ -201,7 +201,7 @@ public class UserService {
         Long userId = Long.valueOf(jwtService.extractId(token));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
-        return "https://t.me/streetracevkbot?startapp=racerId_" + user.getTelegramId();
+        return "t.me/streetracevkbot/streetraceapp?startapp=racerId_" + user.getTelegramId();
     }
 
     public UserFullNameDTO getFullName(String token){

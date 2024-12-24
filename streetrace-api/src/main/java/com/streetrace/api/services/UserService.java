@@ -78,6 +78,7 @@ public class UserService {
 
             user.getUserCars().add(userCar);
             user.setCurrentCar(userCar);
+            userRepository.save(user);
         }
 
         // Логика работы с реферальным ID
@@ -98,14 +99,15 @@ public class UserService {
                         referrer.setMoney(referrer.getMoney() + 1000);
 
                         // Сохраняем изменения у реферера
-                        userRepository.save(referrer);
                     }
                 }
+                userRepository.save(referrer);
             }
         }
 
         // Сохраняем пользователя (для нового или обновленного списка друзей)
         userRepository.save(user);
+
 
         //генерируем токен
         return jwtService.generateToken(user.getId());
